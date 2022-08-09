@@ -1,0 +1,131 @@
+{
+	"compiler": {
+		"version": "0.8.7+commit.e28d00a7"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"inputs": [
+					{
+						"internalType": "string",
+						"name": "_a",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "_b",
+						"type": "string"
+					}
+				],
+				"name": "compare",
+				"outputs": [
+					{
+						"internalType": "int256",
+						"name": "",
+						"type": "int256"
+					}
+				],
+				"stateMutability": "pure",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "string",
+						"name": "_a",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "_b",
+						"type": "string"
+					}
+				],
+				"name": "equal",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "pure",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "string",
+						"name": "_haystack",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "_needle",
+						"type": "string"
+					}
+				],
+				"name": "indexOf",
+				"outputs": [
+					{
+						"internalType": "int256",
+						"name": "",
+						"type": "int256"
+					}
+				],
+				"stateMutability": "pure",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {
+				"compare(string,string)": {
+					"details": "Does a byte-by-byte lexicographical comparison of two strings.",
+					"returns": {
+						"_0": "a negative number if `_a` is smaller, zero if they are equal and a positive numbe if `_b` is smaller."
+					}
+				},
+				"equal(string,string)": {
+					"details": "Compares two strings and returns true iff they are equal."
+				},
+				"indexOf(string,string)": {
+					"details": "Finds the index of the first occurrence of _needle in _haystack"
+				}
+			},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"contracts/Test1.sol": "StringUtils"
+		},
+		"evmVersion": "london",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"contracts/Test1.sol": {
+			"keccak256": "0x17fec6dfa9a76f35aa53ad1955eb0b348dd2fd9821e8b1d2e3022ab0b751e86d",
+			"license": "Unlicensed",
+			"urls": [
+				"bzz-raw://98a75f40e0e523d0d13a0d7164d289c892b852c212166241dc80e93d7e1a4855",
+				"dweb:/ipfs/Qmbobds1UULNxnEsLnu6xzt5DBjjMenD7PwcLhDiJVypSF"
+			]
+		}
+	},
+	"version": 1
+}
