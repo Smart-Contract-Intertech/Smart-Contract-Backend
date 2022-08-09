@@ -92,7 +92,9 @@ contract Test1{
     }*/
 
     User[] public users;
+    User[] public kidsArray;
     mapping(address => User) public investors;
+    mapping(address => User[]) public investorKidConnection;
 
     function addUser(address walletAddress, string memory name, uint amount, bool isInvestor) public onlyOwner{
         users.push(User(walletAddress, name, amount, isInvestor));
@@ -108,6 +110,13 @@ contract Test1{
         }
     }
 
+    function addKidToInvestor(address investorAddress, address kidAddress) public onlyOwner{
+        User memory kid = getKidByAddress(kidAddress);
+        kidsArray.push(kid);
+
+        investorKidConnection[investorAddress] = kidsArray;
+    }
+
     function getUserByAddress(address walletAddress) public returns(User memory user){
         for(uint i = 0; i < users.length; i++){
             if(users[i].walletAddress == walletAddress){
@@ -116,6 +125,21 @@ contract Test1{
             }
         }
         revert("Invalid Wallet Address");
+    }
+
+    function getKidByAddress(address walletAddress) public view returns(User memory kid){
+        for(uint i = 0; i < users.length; i++){
+            if(users[i].walletAddress == walletAddress){
+                return users[i];
+            }
+        }
+        revert("Invalid Wallet Address");
+    }
+
+    function getKidsOfInvestor(address walletAddress) public view returns(User[] memory){
+        //User memory user = getUserByAddress(walletAddress);
+        return investorKidConnection[walletAddress];
+        //for(uint i = 0; i < investorKidConnection[walletAddress].length; i++)
     }
 
     function investorPermission(address walletAddress) public returns(bool){
