@@ -1,8 +1,12 @@
-// SPDX-License-Identifier: Unlicensed
+//SPDX-License-Identifier: Unlicensed
 
 pragma solidity ^0.8.7;
 
+import "EthereumDatetime.sol";
+
 contract CryptoKids {
+
+    using DateTime for uint;
 
     address owner;
 
@@ -27,6 +31,14 @@ contract CryptoKids {
         require(msg.sender == owner, "Only owner can add kids");
         _;
     }
+
+    function getRemainingTime(uint timestamp) public pure returns (uint day, uint month, uint year, uint hour) {
+        day = DateTime.getDay(timestamp);
+        month = DateTime.getMonth(timestamp);
+        year = DateTime.getYear(timestamp);
+        hour = DateTime.getHour(timestamp);
+    }
+    
 
     function addKid(address payable walletAddress, string memory firstName, string memory lastName, uint releaseTime, uint amount, bool canWithdraw) public onlyOwner{
         kids.push(Kid(walletAddress, firstName, lastName, releaseTime, amount, canWithdraw));
