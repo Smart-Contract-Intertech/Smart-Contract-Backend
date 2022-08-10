@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Unlicensed
 
 pragma solidity ^0.8.7;
-
+import "@openzeppelin/contracts/utils/Strings.sol";
 
 
 library StringUtils {
@@ -69,10 +69,12 @@ contract Test1{
     }
 
     struct User{
-        address walletAddress;
+        address payable walletAddress;
         string name;
         uint amount;
+        uint releaseTime;
         bool isInvestor;
+        bool canWithdraw;
     }
 
     modifier onlyOwner(){
@@ -96,8 +98,8 @@ contract Test1{
     mapping(address => User) public investors;
     mapping(address => User[]) public investorKidConnection;
 
-    function addUser(address walletAddress, string memory name, uint amount, bool isInvestor) public onlyOwner{
-        users.push(User(walletAddress, name, amount, isInvestor));
+    function addUser(address payable walletAddress, string memory name, uint amount, uint releaseTime, bool isInvestor, bool canWithdraw) public onlyOwner{
+        users.push(User(walletAddress, name, amount, releaseTime, isInvestor, canWithdraw));
     }
 
     function addToInvestors(address walletAddress) public onlyOwner{
@@ -186,7 +188,38 @@ contract Test1{
         return 999;
     }
 
+    function getIndexOfUser(address walletAddress) private view returns(uint){
+        for(uint i = 0; i < users.length; i++){
+            if(users[i].walletAddress == walletAddress){
+                return i;
+            }
+        }
+        return 999;
+    }
 
+    function availableToWithdraw(address walletAddress) public returns(bool){
+        uint i = getIndexOfUser(walletAddress);
 
+        uint startDate = block.timestamp;
+        uint paymentDate = users[i].releaseTime;
 
+        uint daysLeft = (paymentDate - startDate) / 60 / 60 / 24;
+        string memory message = string.concat("You have to wait ", Strings.toString(daysLeft), " days to withdraw");
+
+        require(block.timestamp > users[i].releaseTime, message);
+        if(block.timestamp > users[i].releaseTime){
+            users[i].canWithdraw = true;
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
+    function withdraw(address payable walletAddress) payable public {
+        uint i = getIndexOfUser(walletAddress);        
+        require(msg.sender == users[i].walletAddress, "You must be the kid to withdraw");
+        require(users[i].canWithdraw == true, "You can't withdraw yet");
+        users[i].walletAddress.transfer(users[i].amount);
+    } 
 }
