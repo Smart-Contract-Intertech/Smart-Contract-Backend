@@ -136,6 +136,17 @@ contract ConditionalInvesment{
         }
     }
 
+    function getInvesmentByRecipientAddress(address receiver) public view returns(uint){
+        for(uint i = 0; i < invesments.length; i++){
+            if(invesments[i].receiver == receiver){
+                return invesments[i].invesmentNo;
+            }
+        }
+    }
+
+    event ReverseInvesmentInfo(address  invester, address  receiver, uint amount,  uint timeOfInvesment, uint invesmentNo);
+
+
     function reverseInvesment(uint invesmentNo) payable public {
         //cancel an invesment
         require(invesments[invesmentNo].invester == msg.sender, "You are not the investor, only investors can cancel an invesment.");
@@ -175,5 +186,17 @@ contract ConditionalInvesment{
             invesments[invesmentNo].amount = amount;
         }
         invesments[invesmentNo].timeForRelease = timeForRelease;
+    }
+
+    function balanceOfRecipient(address recipient) public view returns(uint){
+        return userMapping[recipient].funds;
+    }
+
+    function balanceOfInvesment(uint invesmentNo) public view returns (uint){
+        for(uint i = 0; i < invesments.length; i++){
+            if(invesments[i].invesmentNo == invesmentNo){
+                return invesments[i].amount;
+            }
+        }
     }
 }
