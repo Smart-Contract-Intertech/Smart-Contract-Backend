@@ -29,6 +29,19 @@ describe ("ConditionalInvesment", function () {
         await new Promise(res => setTimeout(() => res(null), 5000));    //This is needed for ethers to poll the emitted blocks, ?? polling time could be changed also
         await expect( cond.myInvesments()).to.emit(cond, "InvesmentInfo");//.withArgs(owner.address);
     })
+    it("Should reverse the invesment", async function (){
+        const {cond} = await loadFixture(deployFixture);
+        const [owner, otherAccount] = await ethers.getSigners();
+
+        cond.makeInvesment(otherAccount.address, 1000, { from: owner.address, value: ethers.utils.parseEther("15")});
+        await new Promise(res => setTimeout(() => res(null), 5000)); 
+        const invesmentNo = cond.getInvesmentByRecipientAddress(otherAccount.address);
+        //cond.reverseInvesment(invesmentNo);
+        const latestBlock = await hre.ethers.provider.getBlock("latest");
+
+        expect(await cond.reverseInvesment(invesmentNo)).to.emit(cond, "ReverseInvesmentInfo");//.withArgs(owner.address, otherAccount.address, 0, latestBlock.timestamp, invesmentNo);
+        //expect(await cond.balanceOfInvesment(invesmentNo)).to.equal(0);
+    })
 
 
 })
