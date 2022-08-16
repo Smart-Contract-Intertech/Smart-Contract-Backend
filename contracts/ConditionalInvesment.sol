@@ -109,6 +109,7 @@ contract ConditionalInvesment{
     event RegisteredUser(address userAddress);
 
     function getRecipients() public{
+        require(userMapping[msg.sender].recipients.length > 0, "No recipient registered");
         for(uint i = 0; i < userMapping[msg.sender].recipients.length; i++){
             address recipientAddress = userMapping[msg.sender].recipients[i];
             emit RegisteredUser(recipientAddress);
@@ -119,12 +120,16 @@ contract ConditionalInvesment{
 
     function invesmentsMadeToMe() public {
         //return the sum of the invesments from "invesmentsToMe" array
-
+        require(userMapping[msg.sender].invesmentsToMe.length > 0, "There are no invesments made for you");
+        bool allInactive = true;                                                                                    //used this variable to check if the listed invesments active or not
         for(uint i = 0; i < userMapping[msg.sender].invesmentsToMe.length; i++){
             uint invesmentNo = userMapping[msg.sender].invesmentsToMe[i];
-            emit InvesmentInfo(invesments[invesmentNo].invester,invesments[invesmentNo].receiver , invesments[invesmentNo].amount, invesments[invesmentNo].timeOfInvesment,  invesments[invesmentNo].timeForRelease, invesments[invesmentNo].invesmentNo);
+            if(invesments[invesmentNo].isActive){
+                emit InvesmentInfo(invesments[invesmentNo].invester,invesments[invesmentNo].receiver , invesments[invesmentNo].amount, invesments[invesmentNo].timeOfInvesment,  invesments[invesmentNo].timeForRelease, invesments[invesmentNo].invesmentNo);
+                allInactive = false;
+            }
         }
-
+        require(!allInactive, "There are no invesments made for you");
     }
 
     function myInvesments() public {
@@ -144,11 +149,12 @@ contract ConditionalInvesment{
         invesments[invesmentNo].isActive = false;
         userMapping[msg.sender].funds = userMapping[msg.sender].funds + invesments[invesmentNo].amount;
     }
-
+ 
     function makeInvesment(address  receiver, uint timeForRelease) payable public {
         uint invesmentNo = invesments.length;
         userMapping[msg.sender].myInvesments.push(invesmentNo);
-        //emit length(userMapping[msg.sender].myInvesments.length);
+        userMapping[receiver].invesmentsToMe.push(invesmentNo);
+        emit InvesmentInfo(msg.sender,receiver,msg.value,block.timestamp,timeForRelease,invesmentNo);
         invesments.push(invesment(msg.sender, receiver, msg.value , block.timestamp, timeForRelease, true, true, invesmentNo));
         
     }
@@ -166,7 +172,7 @@ contract ConditionalInvesment{
         require(invesments[invesmentNo].isActive, "This is an inactive invesment.");
         require(invesments[invesmentNo].timeOfInvesment + timeForRelease >= block.timestamp, "You can not set an invesment to be relased in a past date.");
         if(amount > invesments[invesmentNo].amount){
-            require(userMapping[msg.sender].funds >= (invesments[invesmentNo].amount - amount), "Insufficent funds to revise invesment." );
+            require(userMapping[msg.sender].funds >= (amount - invesments[invesmentNo].amount), "Insufficent funds to revise invesment.");
             userMapping[msg.sender].funds =  userMapping[msg.sender].funds - (invesments[invesmentNo].amount - amount);
             invesments[invesmentNo].amount = amount;
         }
