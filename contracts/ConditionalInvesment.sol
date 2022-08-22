@@ -106,39 +106,40 @@ contract ConditionalInvesment{
         }
     }
 
-    event RegisteredUser(address userAddress);
-
-    function getRecipients() public{
+    function getRecipients() public view returns(address[] memory) {
         require(userMapping[msg.sender].recipients.length > 0, "No recipient registered");
+        address[] memory returnArray = new address[](userMapping[msg.sender].recipients.length);
         for(uint i = 0; i < userMapping[msg.sender].recipients.length; i++){
             address recipientAddress = userMapping[msg.sender].recipients[i];
-            emit RegisteredUser(recipientAddress);
+            returnArray[i] = recipientAddress;
         }
+        return returnArray;
     }
 
-    event InvesmentInfo(address  invester, address  receiver, uint amount,  uint timeOfInvesment, uint timeForRelease, uint invesmentNo);
 
-    function invesmentsMadeToMe() public {
-        //return the sum of the invesments from "invesmentsToMe" array
+    function invesmentsMadeToMe() public view returns(invesment[] memory) {
         require(userMapping[msg.sender].invesmentsToMe.length > 0, "There are no invesments made for you");
+        invesment[] memory returnArray = new invesment[](userMapping[msg.sender].invesmentsToMe.length);
+        //return the sum of the invesments from "invesmentsToMe" array
         bool allInactive = true;                                                                                    //used this variable to check if the listed invesments active or not
         for(uint i = 0; i < userMapping[msg.sender].invesmentsToMe.length; i++){
             uint invesmentNo = userMapping[msg.sender].invesmentsToMe[i];
+            returnArray[i] = invesments[invesmentNo];
             if(invesments[invesmentNo].isActive){
-                emit InvesmentInfo(invesments[invesmentNo].invester,invesments[invesmentNo].receiver , invesments[invesmentNo].amount, invesments[invesmentNo].timeOfInvesment,  invesments[invesmentNo].timeForRelease, invesments[invesmentNo].invesmentNo);
                 allInactive = false;
             }
         }
         require(!allInactive, "There are no invesments made for you");
+        return returnArray;
     }
 
-    function myInvesments() public {
+    function myInvesments() view public returns( invesment[] memory ) {
+        invesment[] memory returnMyInvesments = new invesment[](userMapping[msg.sender].myInvesments.length);
         for(uint i = 0; i < userMapping[msg.sender].myInvesments.length; i++){
-            console.log(i);
             uint invesmentNo = userMapping[msg.sender].myInvesments[i];
-            console.log(invesments[invesmentNo].invester);
-            emit InvesmentInfo(invesments[invesmentNo].invester,invesments[invesmentNo].receiver , invesments[invesmentNo].amount, invesments[invesmentNo].timeOfInvesment,  invesments[invesmentNo].timeForRelease, invesments[invesmentNo].invesmentNo);
+            returnMyInvesments[i] = invesments[invesmentNo];
         }
+        return returnMyInvesments;
     }
 
     function reverseInvesment(uint invesmentNo) payable public {
@@ -154,7 +155,6 @@ contract ConditionalInvesment{
         uint invesmentNo = invesments.length;
         userMapping[msg.sender].myInvesments.push(invesmentNo);
         userMapping[receiver].invesmentsToMe.push(invesmentNo);
-        emit InvesmentInfo(msg.sender,receiver,msg.value,block.timestamp,timeForRelease,invesmentNo);
         invesments.push(invesment(msg.sender, receiver, msg.value , block.timestamp, timeForRelease, true, true, invesmentNo));
         
     }
